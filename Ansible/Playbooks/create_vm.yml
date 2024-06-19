@@ -1,0 +1,26 @@
+---
+- name: Create VMs in Proxmox from Template
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Proxmox API credentials
+    proxmox_api_host: "https://proxmox.example.com:8006/api2/json"
+    proxmox_api_user: "root@pam"
+    proxmox_api_password: "your_password"
+    # VM specifics
+    vm_node: "pve"
+    vm_template_vmid: 9000  # ID des vorhandenen Templates, das geklont werden soll
+    num_vms: 5  # Anzahl der zu erstellenden VMs
+    vm_name_prefix: "VM-Auto-"  # Präfix für den VM-Namen
+
+  tasks:
+    - name: Create VMs from Template
+      ansible.builtin.debug:
+        msg: "Creating VM {{ item }}"
+      loop: "{{ range(1, num_vms + 1) | list }}"
+      ansible.builtin.include_tasks: create_vm_from_template.yml
+      vars:
+        vm_id: "{{ 'auto-' ~ loop.index0 + 1 }}"
+        vm_name: "{{ vm_name_prefix }}{{ '%04d' | format(loop.index1) }}"
+        vm_template_vmid: "{{ vm_template_vmid }}"
+      delegate_to: localhost

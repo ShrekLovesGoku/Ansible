@@ -1,0 +1,22 @@
+# create_vm_from_template.yml
+---
+- name: Clone VM from Template
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ vm_node }}"
+    vmid: "{{ vm_id }}"
+    name: "{{ vm_name }}"
+    clone: true
+    clone_id: "{{ vm_template_vmid }}"
+    state: present
+
+- name: Start VM
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ vm_node }}"
+    vmid: "{{ vm_id }}"
+    state: started
