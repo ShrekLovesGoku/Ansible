@@ -42,8 +42,8 @@
     - name: Start Apache service
       service:
         name: apache2  # Behalten Sie 'apache2' bei oder passen Sie ihn an, basierend auf den Debug-Ergebnissen
-        state: started
-        
+        state: present
+        enabled: yes
 
     - name: Create content
       copy:
