@@ -23,7 +23,7 @@
 
     - name: Start Apache service
       service:
-        name: apache2
+        name: httpd
         state: started
         enabled: yes
 
