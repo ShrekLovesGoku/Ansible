@@ -1,21 +1,33 @@
 ---
 - name: Beispiel
-  hosts: PXEAnsibleDC-Test 
+  hosts: PXEAnsibleDC-Test
   become: true
   tasks:
+    - name: Update APT package list
+      apt:
+        update_cache: yes
+
     - name: Install Apache2
       apt:
         name: apache2
         state: present
-        update_cache: yes  # Optional, um sicherzustellen, dass die Paketliste aktualisiert wird
+
+    - name: Verify Apache2 installation
+      command: dpkg -l apache2
+      register: apache2_installed
+      failed_when: "'apache2' not in apache2_installed.stdout"
+
+    - name: Debug Apache2 installation result
+      debug:
+        var: apache2_installed
 
     - name: Start Apache service
       service:
         name: apache2
         state: started
-        enabled: yes  # Optional, um sicherzustellen, dass der Dienst beim Systemstart gestartet wird
+        enabled: yes
 
     - name: Create content
-      copy: 
+      copy:
         content: "Hallo Shrek"
         dest: /var/www/html/index.html
