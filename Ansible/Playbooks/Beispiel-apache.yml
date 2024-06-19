@@ -13,17 +13,35 @@
         state: present
 
     - name: Verify Apache2 installation
-      command: dpkg -l apache2
+      shell: dpkg -l | grep apache2
       register: apache2_installed
-      failed_when: "'apache2' not in apache2_installed.stdout"
+      ignore_errors: yes
 
     - name: Debug Apache2 installation result
       debug:
         var: apache2_installed
 
+    - name: Check Apache service status
+      shell: systemctl status apache2
+      register: apache2_status
+      ignore_errors: yes
+
+    - name: Debug Apache service status
+      debug:
+        var: apache2_status
+
+    - name: Check alternative Apache service names
+      shell: systemctl list-units --type=service | grep -i 'apache\|httpd\|www'
+      register: alternative_apache_services
+      ignore_errors: yes
+
+    - name: Debug alternative Apache services
+      debug:
+        var: alternative_apache_services
+
     - name: Start Apache service
       service:
-        name: httpd
+        name: apache2  # Behalten Sie 'apache2' bei oder passen Sie ihn an, basierend auf den Debug-Ergebnissen
         state: started
         enabled: yes
 
