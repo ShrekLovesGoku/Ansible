@@ -1,0 +1,9 @@
+[PXEAnsibleDC-Linux]
+Linux-Srv-Fog-01 ansible_ssh_user=root ansible_ssh_pass=Zli12345
+
+[PXEAnsibleDC-Test]
+Test_Ansible ansible_ssh_user=root ansible_ssh_pass=Zli1234
+
+[PXEAnsibleDC-Windows]
+Win-Srv-DC-01 ansible_ssh_user=root ansible_ssh_pass=Zli12345
+

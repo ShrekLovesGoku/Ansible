@@ -1,0 +1,21 @@
+---
+- name: Beispiel
+  hosts: PXEAnsibleDC-Test 
+  become: true
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes  # Optional, um sicherzustellen, dass die Paketliste aktualisiert wird
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes  # Optional, um sicherzustellen, dass der Dienst beim Systemstart gestartet wird
+
+    - name: Create content
+      copy: 
+        content: "Hallo Shrek"
+        dest: /var/www/html/index.html
