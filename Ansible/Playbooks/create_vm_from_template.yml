@@ -19,22 +19,22 @@
         api_host: "{{ proxmox_api_host }}"
         api_token: "{{ proxmox_api_token }}"
         node: "{{ vm_node }}"
-        vmid: "{{ vm_id }}"
-        name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_id - vm_id_start + 1) }}"
+        vmid: "{{ vm_id | int }}"
+        name: "{{ vm_name_prefix }}{{ '%04d' | format(item + 1) }}"
         clone: true
         clone_id: "{{ vm_template_vmid }}"
         state: present
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) }}"
+      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
       loop_control:
-        loop_var: vm_id  # Name der Schleifenvariable
+        loop_var: item
 
     - name: Start cloned VMs
       community.general.proxmox_kvm:
         api_host: "{{ proxmox_api_host }}"
         api_token: "{{ proxmox_api_token }}"
         node: "{{ vm_node }}"
-        vmid: "{{ vm_id }}"
+        vmid: "{{ vm_id | int }}"
         state: started
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) }}"
+      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
       loop_control:
-        loop_var: vm_id  # Name der Schleifenvariable
+        loop_var: item
