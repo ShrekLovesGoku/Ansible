@@ -13,8 +13,8 @@
         api_password: Zli12345
         api_host: 10.80.15.32
         node: diego-proxmox-srv
-        name: "VM-auto-{{ '%04d'|format(item) }}"  # Name wird mit fortlaufender Nummer erstellt
-        clone: true  # Kopieren eines bestehenden Templates
-        template: '1000'  # ID des vorhandenen Templates als Zeichenfolge
+        name: "VM-auto-{{ '%04d'|format(item) }}"
+        clone: yes  # Boolescher Wert für das Klonen der Vorlage
+        template: '1000'  # ID der Vorlage als String angegeben
         state: started
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
