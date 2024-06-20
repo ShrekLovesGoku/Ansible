@@ -1,3 +1,4 @@
+---
 - name: Clone and Start VMs from Template on Proxmox
   hosts: PXEAnsibleDC-Proxmox
   vars:
@@ -8,9 +9,17 @@
     template_id: 1000  # ID der Vorlage (Template)
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
+    - name: Activate Python virtual environment
+      ansible.builtin.command: /root/proxmoxer-venv/bin/activate
+      environment:
+        VIRTUAL_ENV: /root/proxmoxer-venv
+      become: true
+      become_user: root
+
     - name: Clone and Start VMs
-      shell: |
-        source /root/proxmoxer-venv/bin/activate && python3 - <<EOF
+      ansible.builtin.shell: |
+        source /root/proxmoxer-venv/bin/activate &&
+        python3 - <<EOF
         from proxmoxer import ProxmoxAPI
 
         proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
@@ -30,4 +39,4 @@
             proxmox.nodes('{{ proxmox_node }}').qemu.status(new_vm_id).start()
         EOF
       register: proxmox_output
-      changed_when: "'task failed' not in proxmox_output.stderr"
+      changed_when: "proxmox_output.rc != 127"
