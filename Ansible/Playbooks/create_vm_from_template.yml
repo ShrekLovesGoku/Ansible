@@ -15,6 +15,7 @@
         from proxmoxer import ProxmoxAPI
         import requests
 
+        # Deaktivieren der SSL-Verifizierung (nicht empfohlen in Produktionsumgebungen)
         proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
 
         for i in range({{ num_vms }}):
@@ -26,8 +27,6 @@
                 node='{{ proxmox_node }}',
                 create='clone',
                 name=new_vm_name,
-                full='false',
-                target='local',
                 vmid=new_vm_id,
                 template='{}'.format({{ template_id }})
             )
@@ -37,5 +36,3 @@
         EOF
       register: proxmox_output
       changed_when: "proxmox_output.rc != 127"
-
-
