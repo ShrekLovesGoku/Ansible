@@ -1,21 +1,30 @@
 ---
-- name: Create VMs in Proxmox from Template
+- name: Create VMs in Proxmox from Template by Name
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
   vars:
-    # Proxmox API credentials with username and password
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
-    proxmox_api_user: "root@pam"  # Ersetze durch deinen Proxmox API-Benutzernamen
-    proxmox_api_password: "Zli12345"  # Ersetze durch dein Proxmox API-Passwort
-    # VM-spezifische Variablen
-    vm_node: "diego-proxmox-srv"  # Aktualisierter Hostname des Proxmox-Servers
-    vm_id_start: 2000  # Start-ID für die neuen VMs
-    vm_name_prefix: "vm-auto-"  # Präfix für die neuen VMs
-    vm_template_vmid: 1000  # ID der vorhandenen Vorlage, die geklont werden soll
-    vm_count: 3  # Anzahl der zu erstellenden VMs
+    proxmox_api_user: "root@pam"
+    proxmox_api_password: "Zli12345"
+    vm_node: "diego-proxmox-srv"
+    vm_id_start: 2000
+    vm_name_prefix: "vm-auto-"
+    vm_template_name: "ubuntu-cloud"  # Hier den Namen der VM-Vorlage eintragen
+    vm_count: 3
 
   tasks:
-    - name: Clone VMs from Template
+    - name: Get VM Template ID by Name
+      proxmox:
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
+        api_host: "{{ proxmox_api_host }}"
+        nodes: "{{ vm_node }}"
+        query_type: template
+        content: id
+        template_filter: name={{ vm_template_name }}
+      register: template_result
+
+    - name: Clone VMs from Template by Name
       community.general.proxmox_kvm:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
@@ -23,7 +32,7 @@
         node: "{{ vm_node }}"
         vmid: "{{ vm_id_start + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ vm_template_vmid }}"  # Korrigierte Verwendung der Template-ID hier
+        template: "{{ template_result['content']['template']['id'] }}"
         state: present
       loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
       loop_control:
