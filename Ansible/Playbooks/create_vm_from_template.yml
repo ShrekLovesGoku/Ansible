@@ -23,7 +23,7 @@
         node: "{{ vm_node }}"
         vmid: "{{ vm_id_start + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ vm_template_vmid }}"  # Use 'template' instead of 'clone_id'
+        template: "{{ vm_template_vmid }}"  # Correctly use the template ID here
         state: present
       loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
       loop_control:
