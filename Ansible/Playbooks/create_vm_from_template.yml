@@ -13,6 +13,7 @@
       ansible.builtin.shell: |
         . /root/proxmoxer-venv/bin/activate && python3 - <<EOF
         from proxmoxer import ProxmoxAPI
+        import requests
 
         proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
 
@@ -32,3 +33,4 @@
         EOF
       register: proxmox_output
       changed_when: "proxmox_output.rc != 127"
+
