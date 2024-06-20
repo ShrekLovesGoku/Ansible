@@ -20,10 +20,9 @@
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        clone: "{{ vm_template_id }}"
+        template: "{{ vm_template_id }}"
         full: false
         state: present
-        hostname: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
