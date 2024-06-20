@@ -1,7 +1,7 @@
 ---
-- name: Create and start VMs using Cloud-Init template
-  hosts: PXEAnsibleDC-Proxmox  # Hosts auf localhost setzen, da Ansible lokal aufgerufen wird
-  gather_facts: no  # Keine Fakten über den Host sammeln
+- name: Create and start VMs using Proxmox KVM module
+  hosts: PXEAnsibleDC-Proxmox
+  gather_facts: no
 
   tasks:
     - name: Create and start multiple VMs
