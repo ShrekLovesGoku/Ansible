@@ -14,7 +14,7 @@
         api_host: 10.80.15.32
         node: diego-proxmox-srv
         name: "VM-auto-{{ '%04d'|format(item) }}"  # Name wird mit fortlaufender Nummer erstellt
-        clone: true  # Kopieren eines bestehenden Templates
+        clone: ubuntu-cloud  # Kopieren eines bestehenden Templates
         template: 1  # ID des vorhandenen Templates als Zeichenfolge
         state: started
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
