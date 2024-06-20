@@ -5,14 +5,14 @@
   vars:
     # Proxmox API credentials with username and password
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
-    proxmox_api_user: "root@pam"  # Replace with your Proxmox API username
-    proxmox_api_password: "Zli12345"  # Replace with your Proxmox API password
-    # VM specifics
-    vm_node: "diego-proxmox-srv"
-    vm_id_start: 2000  # Start-ID for the new VMs
-    vm_name_prefix: "vm-auto-"  # Prefix for the new VMs
-    vm_template_vmid: 1000  # ID of the existing template to clone
-    vm_count: 3  # Number of VMs to create
+    proxmox_api_user: "root@pam"  # Ersetze durch deinen Proxmox API-Benutzernamen
+    proxmox_api_password: "Zli12345"  # Ersetze durch dein Proxmox API-Passwort
+    # VM-spezifische Variablen
+    vm_node: "diego-proxmox-srv"  # Aktualisierter Hostname des Proxmox-Servers
+    vm_id_start: 2000  # Start-ID für die neuen VMs
+    vm_name_prefix: "vm-auto-"  # Präfix für die neuen VMs
+    vm_template_vmid: 1000  # ID der vorhandenen Vorlage, die geklont werden soll
+    vm_count: 3  # Anzahl der zu erstellenden VMs
 
   tasks:
     - name: Clone VMs from Template
@@ -23,7 +23,7 @@
         node: "{{ vm_node }}"
         vmid: "{{ vm_id_start + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ vm_template_vmid }}"  # Correctly use the template ID here
+        template: "{{ vm_template_vmid }}"  # Korrigierte Verwendung der Template-ID hier
         state: present
       loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
       loop_control:
