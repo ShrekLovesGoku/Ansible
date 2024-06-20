@@ -6,7 +6,7 @@
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
     proxmox_api_user: "root@pam"
     proxmox_api_password: "Zli12345"
-    vm_node: "diego-proxmox-srv"
+    vm_node: diego-proxmox-srv
     vm_id_start: 2000
     vm_name_prefix: "vm-auto-"
     vm_template_name: "ubuntu-cloud"  # Hier den Namen der VM-Vorlage eintragen
