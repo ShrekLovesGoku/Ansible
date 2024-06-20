@@ -1,11 +1,12 @@
 ---
 - name: Create VMs in Proxmox from Template
-  hosts: PXE-Ansible-Proxmox
+  hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
   vars:
     # Proxmox API credentials with API token
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
-    proxmox_api_token: "e06dac6c-0c64-4166-9002-3342132e080a"  # Replace with your actual API token
+    proxmox_api_user: "root@pam"  # Replace with your Proxmox API username
+    proxmox_api_password: "Zli12345"  # Replace with your Proxmox API password or API token
     # VM specifics
     vm_node: "diego-proxmox-srv"
     vm_id_start: 2000  # Start-ID für die neuen VMs
@@ -17,7 +18,8 @@
     - name: Clone VMs from Template
       community.general.proxmox_kvm:
         api_host: "{{ proxmox_api_host }}"
-        api_token: "{{ proxmox_api_token }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
         vmid: "{{ vm_id_start + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
@@ -31,7 +33,8 @@
     - name: Start cloned VMs
       community.general.proxmox_kvm:
         api_host: "{{ proxmox_api_host }}"
-        api_token: "{{ proxmox_api_token }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
         vmid: "{{ vm_id_start + vm_index }}"
         state: started
