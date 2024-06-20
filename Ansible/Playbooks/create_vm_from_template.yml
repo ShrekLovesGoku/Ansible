@@ -1,10 +1,10 @@
 - name: Clone and Start VMs from Template on Proxmox
-  hosts: localhost
+  hosts: PXEAnsibleDC-Proxmox
   vars:
-    proxmox_server: 'your.proxmox.server'  # Adresse Ihres Proxmox-Servers
-    proxmox_user: 'your_user@pam'  # Ihr Benutzername für Proxmox
-    proxmox_password: 'your_password'  # Ihr Passwort für Proxmox
-    proxmox_node: 'my-proxmox-node'  # Name des Proxmox-Knotens
+    proxmox_server: '10.80.15.32'  # Adresse Ihres Proxmox-Servers
+    proxmox_user: 'root@pam'  # Ihr Benutzername für Proxmox
+    proxmox_password: 'Zli12345'  # Ihr Passwort für Proxmox
+    proxmox_node: 'diego-proxmox-srv'  # Name des Proxmox-Knotens
     template_id: 1000  # ID der Vorlage (Template)
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
