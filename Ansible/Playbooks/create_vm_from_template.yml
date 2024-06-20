@@ -9,10 +9,9 @@
     template_id: 1000  # ID der Vorlage (Template)
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
-    - name: Activate Python virtual environment
+    - name: Activate Python virtual environment and run script
       ansible.builtin.shell: |
-        source /root/proxmoxer-venv/bin/activate
-        python3 - <<EOF
+        . /root/proxmoxer-venv/bin/activate && python3 - <<EOF
         from proxmoxer import ProxmoxAPI
 
         proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
