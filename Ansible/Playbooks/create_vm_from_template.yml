@@ -3,6 +3,9 @@
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
+  vars:
+    ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+
   tasks:
     - name: Create and start multiple VMs
       community.general.proxmox_kvm:
