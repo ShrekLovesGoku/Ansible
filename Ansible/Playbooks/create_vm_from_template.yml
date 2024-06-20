@@ -10,15 +10,8 @@
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
     - name: Activate Python virtual environment
-      ansible.builtin.command: /root/proxmoxer-venv/bin/activate
-      environment:
-        VIRTUAL_ENV: /root/proxmoxer-venv
-      become: true
-      become_user: root
-
-    - name: Clone and Start VMs
       ansible.builtin.shell: |
-        source /root/proxmoxer-venv/bin/activate &&
+        source /root/proxmoxer-venv/bin/activate
         python3 - <<EOF
         from proxmoxer import ProxmoxAPI
 
