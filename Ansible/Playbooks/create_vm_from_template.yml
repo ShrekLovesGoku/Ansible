@@ -29,14 +29,14 @@
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ template_result['id'] }}"  # Hier auf das Feld zugreifen, das das Template-ID enthält
+        template: "{{ template_result.template }}"
         state: present
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
 
     - name: Start cloned VMs
-      community.general.proxmox_vm:
+      community.general.proxmox_kvm:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
