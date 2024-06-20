@@ -15,6 +15,6 @@
         node: diego-proxmox-srv
         name: "VM-auto-{{ '%04d'|format(item) }}"
         clone: yes  # Boolescher Wert für das Klonen der Vorlage
-        template: '1000'  # ID der Vorlage als String angegeben
+        template: true  # ID der Vorlage als String angegeben
         state: started
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
