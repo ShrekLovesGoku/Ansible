@@ -20,7 +20,7 @@
         nodes: "{{ vm_node }}"
         query_type: template
         content: id
-        template_filter: name={{ vm_template_name }}
+        template_filter: "name={{ vm_template_name }}"
       register: template_result
 
     - name: Clone VMs from Template by Name
@@ -33,7 +33,7 @@
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
         template: "{{ template_result['content']['template']['id'] }}"
         state: present
-      loop: "{{ query('sequence', 'start=0 count=' ~ vm_count) }}"
+      loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
 
@@ -45,6 +45,6 @@
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         state: started
-      loop: "{{ query('sequence', 'start=0 count=' ~ vm_count) }}"
+      loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
