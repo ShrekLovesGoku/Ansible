@@ -1,5 +1,5 @@
 - name: Clone and Start VMs from Template on Proxmox
-  hosts: localhost
+  hosts: PXEAnsibleDC-Proxmox
   vars:
     proxmox_server: '10.80.15.32'  # Ihre Proxmox-Server-IP-Adresse
     proxmox_user: 'root@pam'  # Ihr Proxmox-Benutzername
