@@ -1,16 +1,16 @@
 - name: Clone and Start VMs from Template on Proxmox
-  hosts: PXEAnsibleDC-Proxmox
+  hosts: localhost
   vars:
-    proxmox_server: '10.80.15.32'  # Adresse Ihres Proxmox-Servers
-    proxmox_user: 'root@pam'  # Ihr Benutzername für Proxmox
-    proxmox_password: 'Zli12345'  # Ihr Passwort für Proxmox
+    proxmox_server: '10.80.15.32'  # Ihre Proxmox-Server-IP-Adresse
+    proxmox_user: 'root@pam'  # Ihr Proxmox-Benutzername
+    proxmox_password: 'Zli12345'  # Ihr Proxmox-Passwort
     proxmox_node: 'diego-proxmox-srv'  # Name des Proxmox-Knotens
     template_id: 1000  # ID der Vorlage (Template)
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
     - name: Clone and Start VMs
-      shell: >
-        /usr/bin/python3 - <<EOF
+      shell: |
+        source /root/proxmoxer-venv/bin/activate && python3 - <<EOF
         from proxmoxer import ProxmoxAPI
 
         proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
