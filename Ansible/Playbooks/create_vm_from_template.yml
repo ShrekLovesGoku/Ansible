@@ -1,20 +1,34 @@
 ---
-- name: Create and start VMs using Proxmox KVM module
+- name: Get Proxmox template ID
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
-  vars:
-    ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-
   tasks:
-    - name: Create and start multiple VMs
-      community.general.proxmox_kvm:
+    - name: Fetch Proxmox template ID
+      community.general.proxmox_template_info:
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
         node: diego-proxmox-srv
-        name: "VM-auto-{{ '%04d'|format(item) }}"
-        clone: yes  # Boolescher Wert für das Klonen der Vorlage
-        template: true  # ID der Vorlage als String angegeben
-        state: started
-      loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
+        template: ubuntu-cloud  # Name des Templates, für das du die ID abrufen möchtest
+      register: template_info
+
+    - name: Create and start VMs using Proxmox KVM module
+      hosts: PXEAnsibleDC-Proxmox
+      gather_facts: no
+
+      vars:
+        ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+
+      tasks:
+        - name: Create and start multiple VMs
+          community.general.proxmox_kvm:
+            api_user: root@pam
+            api_password: Zli12345
+            api_host: 10.80.15.32
+            node: diego-proxmox-srv
+            name: "VM-auto-{{ '%04d'|format(item) }}"
+            clone: yes  # Boolescher Wert für das Klonen der Vorlage
+            template: "{{ template_info.id }}"  # ID des Templates, das kopiert werden soll
+            state: started
+          loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
