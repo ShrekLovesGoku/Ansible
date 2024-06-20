@@ -1,27 +1,25 @@
 ---
-- name: Create VMs in Proxmox from Template by ID
+- name: Clone and Start VMs from Template by ID
   hosts: PXEAnsibleDC-Proxmox
-  gather_facts: false
   vars:
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
     proxmox_api_user: "root@pam"
-    proxmox_api_password: "Zli12345"
+    proxmox_api_password: "zli12345"
     vm_node: "diego-proxmox-srv"
-    vm_name_prefix: "vm-auto-"
-    vm_template_id: 1000  # Hier die ID der VM-Vorlage eintragen
-    vm_count: 3
+    vm_count: 3  # Anzahl der zu erstellenden und zu startenden VMs
+    vm_template_id: 1000  # ID der Vorlage, die für die VM-Erstellung verwendet wird
 
   tasks:
     - name: Clone VMs from Template by ID
-      community.general.proxmox_kvm:
+      community.general.proxmox_vm:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
-        name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        clone: "{{ vm_template_id }}"  # Dies ist der richtige Parameter zum Klonen
-        full: false
+        clone: yes
+        name: "VM{{ 2000 + vm_index }}"
+        template: "{{ vm_template_id }}"
         state: present
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
