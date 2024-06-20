@@ -9,34 +9,16 @@
     vm_count: 3  # Anzahl der zu erstellenden und zu startenden VMs
     vm_template_id: 1000  # ID der Vorlage, die für die VM-Erstellung verwendet wird
   tasks:
-    - name: Clone VMs from Template by ID
-      community.general.proxmox_vm:
-        api_host: "{{ proxmox_api_host }}"
-        api_user: "{{ proxmox_api_user }}"
-        api_password: "{{ proxmox_api_password }}"
+    - name: Clone and Start VMs
+      python:
+        client: "{{ proxmox_api_host }}"
+        user: "{{ proxmox_api_user }}"
+        password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
-        clone: yes
-        name: "VM{{ 2000 + vm_index }}"
         template: "{{ vm_template_id }}"
-        state: present
-      loop: "{{ range(0, vm_count) | list }}"
-      loop_control:
-        loop_var: vm_index
-      collections:
-        - community.general
-
-    - name: Start cloned VMs
-      community.general.proxmox_kvm:
-        api_host: "{{ proxmox_api_host }}"
-        api_user: "{{ proxmox_api_user }}"
-        api_password: "{{ proxmox_api_password }}"
-        node: "{{ vm_node }}"
-        vmid: "{{ 2000 + vm_index }}"
+        clone: yes
         state: started
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
-      collections:
-        - community.general
-
