@@ -6,10 +6,9 @@
     proxmox_api_host: "https://10.80.15.32:8006/api2/json"
     proxmox_api_user: "root@pam"
     proxmox_api_password: "Zli12345"
-    vm_node: diego-proxmox-srv
-    vm_id_start: 2000
+    vm_node: "diego-proxmox-srv"
     vm_name_prefix: "vm-auto-"
-    vm_template_name: "ubuntu-cloud"  # Hier den Namen der VM-Vorlage eintragen
+    vm_template_name: "dein_vm_vorlagen_name"  # Hier den Namen der VM-Vorlage eintragen
     vm_count: 3
 
   tasks:
@@ -30,11 +29,11 @@
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
-        vmid: "{{ vm_id_start + vm_index }}"
+        vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
         template: "{{ template_result['content']['template']['id'] }}"
         state: present
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
+      loop: "{{ query('sequence', 'start=0 count=' ~ vm_count) }}"
       loop_control:
         loop_var: vm_index
 
@@ -44,8 +43,8 @@
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
-        vmid: "{{ vm_id_start + vm_index }}"
+        vmid: "{{ 2000 + vm_index }}"
         state: started
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') }}"
+      loop: "{{ query('sequence', 'start=0 count=' ~ vm_count) }}"
       loop_control:
         loop_var: vm_index
