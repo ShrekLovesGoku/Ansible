@@ -20,7 +20,7 @@
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ vm_template_id }}"
+        clone: "{{ vm_template_id }}"  # Dies ist der richtige Parameter zum Klonen
         full: false
         state: present
       loop: "{{ range(0, vm_count) | list }}"
