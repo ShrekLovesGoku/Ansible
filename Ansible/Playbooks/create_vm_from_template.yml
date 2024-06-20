@@ -1,11 +1,10 @@
 ---
 - name: Clone and Start VMs from Template on Proxmox
-  hosts: PXEAnsibleDC-Proxmox
+  hosts: 10.80.15.32
   vars:
-    proxmox_server: '10.80.15.32'  # Ihre Proxmox-Server-IP-Adresse
-    proxmox_user: 'root@pam'  # Ihr Proxmox-Benutzername
-    proxmox_password: 'Zli12345'  # Ihr Proxmox-Passwort
-    proxmox_node: 'diego-proxmox-srv'  # Name des Proxmox-Knotens
+    proxmox_user: 'root@pam'
+    proxmox_password: 'Zli12345'
+    proxmox_node: 'diego-proxmox-srv'
     template_id: 1000  # ID der Vorlage (Template)
     num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
@@ -16,7 +15,7 @@
         import requests
 
         # Deaktivieren der SSL-Verifizierung (nicht empfohlen in Produktionsumgebungen)
-        proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
+        proxmox = ProxmoxAPI('{{ inventory_hostname }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
 
         for i in range({{ num_vms }}):
             new_vm_id = {{ template_id }} + i + 1
@@ -24,11 +23,11 @@
 
             # Cloning VM from Template (template_id) to new_vm_name
             proxmox.nodes('{{ proxmox_node }}').qemu.post(
-                node='{{ proxmox_node }}',
                 create='clone',
-                name=new_vm_name,
                 vmid=new_vm_id,
-                template='{}'.format({{ template_id }})
+                name=new_vm_name,
+                full='false',
+                target='local'
             )
 
             # Starting the cloned VM
