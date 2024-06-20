@@ -1,37 +1,33 @@
----
-- name: Clone and Start VMs
-  hosts: PXEAnsibleDC-Proxmox
+- name: Clone and Start VMs from Template on Proxmox
+  hosts: localhost
   vars:
-    proxmox_api_host: "https://10.80.15.32:8006/api2/json"
-    proxmox_api_user: "root@pam"
-    proxmox_api_password: "zli12345"
-    vm_node: "diego-proxmox-srv"
-    vm_count: 3  # Anzahl der zu erstellenden und zu startenden VMs
-    vm_template_id: 1000  # ID der Vorlage, die für die VM-Erstellung verwendet wird
+    proxmox_server: 'your.proxmox.server'  # Adresse Ihres Proxmox-Servers
+    proxmox_user: 'your_user@pam'  # Ihr Benutzername für Proxmox
+    proxmox_password: 'your_password'  # Ihr Passwort für Proxmox
+    proxmox_node: 'my-proxmox-node'  # Name des Proxmox-Knotens
+    template_id: 1000  # ID der Vorlage (Template)
+    num_vms: 3  # Anzahl der zu erstellenden VMs
   tasks:
-    - name: Clone VMs from Template by ID
-      community.general.proxmox_vm:
-        api_host: "{{ proxmox_api_host }}"
-        api_user: "{{ proxmox_api_user }}"
-        api_password: "{{ proxmox_api_password }}"
-        node: "{{ vm_node }}"
-        vmid: "{{ 2000 + vm_index }}"
-        clone: yes
-        name: "VM{{ 2000 + vm_index }}"
-        template: "{{ vm_template_id }}"
-        state: present
-      loop: "{{ range(0, vm_count) | list }}"
-      loop_control:
-        loop_var: vm_index
+    - name: Clone and Start VMs
+      shell: >
+        /usr/bin/python3 - <<EOF
+        from proxmoxer import ProxmoxAPI
 
-    - name: Start cloned VMs
-      community.general.proxmox_kvm:
-        api_host: "{{ proxmox_api_host }}"
-        api_user: "{{ proxmox_api_user }}"
-        api_password: "{{ proxmox_api_password }}"
-        node: "{{ vm_node }}"
-        vmid: "{{ 2000 + vm_index }}"
-        state: started
-      loop: "{{ range(0, vm_count) | list }}"
-      loop_control:
-        loop_var: vm_index
+        proxmox = ProxmoxAPI('{{ proxmox_server }}', user='{{ proxmox_user }}', password='{{ proxmox_password }}', verify_ssl=False)
+
+        for i in range({{ num_vms }}):
+            new_vm_id = {{ template_id }} + i + 1
+            new_vm_name = 'VM' + str(new_vm_id)
+
+            # Cloning VM from Template (template_id) to new_vm_id
+            proxmox.nodes('{{ proxmox_node }}').qemu.clone(
+                newid=new_vm_id,
+                name=new_vm_name,
+                template={{ template_id }}
+            )
+
+            # Starting the cloned VM
+            proxmox.nodes('{{ proxmox_node }}').qemu.status(new_vm_id).start()
+        EOF
+      register: proxmox_output
+      changed_when: "'task failed' not in proxmox_output.stderr"
