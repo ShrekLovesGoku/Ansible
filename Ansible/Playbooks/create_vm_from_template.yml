@@ -13,21 +13,22 @@
 
   tasks:
     - name: Clone VMs from Template by ID
-      community.general.proxmox_kvm:
+      community.general.proxmox:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ vm_template_id }}"
+        clone: "{{ vm_template_id }}"
+        full: false
         state: present
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
 
     - name: Start cloned VMs
-      community.general.proxmox_kvm:
+      community.general.proxmox:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
