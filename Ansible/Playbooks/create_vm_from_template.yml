@@ -1,6 +1,6 @@
 ---
 - name: Create VMs in Proxmox from Template
-  hosts: diego-proxmox-srv
+  hosts: PXE-Ansible-Proxmox
   gather_facts: false
   vars:
     # Proxmox API credentials with API token
