@@ -12,6 +12,6 @@
         node: diego-proxmox-srv
         name: "VM-auto-{{ '%04d'|format(item) }}"  # Name wird mit fortlaufender Nummer erstellt
         clone: true  # Kopieren eines bestehenden Templates
-        template: 1000  # ID des vorhandenen Templates, das kopiert werden soll
+        template: '1000'  # ID des vorhandenen Templates, das kopiert werden soll
         state: started
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
