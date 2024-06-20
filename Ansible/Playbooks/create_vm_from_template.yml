@@ -13,14 +13,12 @@
 
   tasks:
     - name: Get VM Template ID by Name
-      proxmox:
+      community.general.proxmox_template_info:
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         api_host: "{{ proxmox_api_host }}"
-        nodes: "{{ vm_node }}"
-        query_type: template
-        content: id
-        template_filter: "name={{ vm_template_name }}"
+        node: "{{ vm_node }}"
+        name: "{{ vm_template_name }}"
       register: template_result
 
     - name: Clone VMs from Template by Name
@@ -31,14 +29,14 @@
         node: "{{ vm_node }}"
         vmid: "{{ 2000 + vm_index }}"
         name: "{{ vm_name_prefix }}{{ '%04d' | format(vm_index + 1) }}"
-        template: "{{ template_result['content']['template']['id'] }}"
+        template: "{{ template_result['id'] }}"  # Hier auf das Feld zugreifen, das das Template-ID enthält
         state: present
       loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: vm_index
 
     - name: Start cloned VMs
-      community.general.proxmox_kvm:
+      community.general.proxmox_vm:
         api_host: "{{ proxmox_api_host }}"
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
