@@ -24,11 +24,13 @@
         clone: true
         clone_id: "{{ vm_template_vmid }}"
         state: present
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') | map('to_json') | map('from_json') | list }}"
+      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) }}"
       loop_control:
         loop_var: item
       vars:
-        item: "{{ { 'id': item, 'name': vm_name_prefix ~ '%04d' % (item - vm_id_start + 1) } }}"
+        item:
+          id: "{{ item }}"
+          name: "{{ vm_name_prefix ~ '%04d' % (item - vm_id_start + 1) }}"
 
     - name: Start cloned VMs
       community.general.proxmox_kvm:
@@ -37,8 +39,10 @@
         node: "{{ vm_node }}"
         vmid: "{{ item.id }}"
         state: started
-      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) | map('int') | map('to_json') | map('from_json') | list }}"
+      loop: "{{ query('sequence', 'start=' ~ vm_id_start ~ ' count=' ~ vm_count) }}"
       loop_control:
         loop_var: item
       vars:
-        item: "{{ { 'id': item, 'name': vm_name_prefix ~ '%04d' % (item - vm_id_start + 1) } }}"
+        item:
+          id: "{{ item }}"
+          name: "{{ vm_name_prefix ~ '%04d' % (item - vm_id_start + 1) }}"
