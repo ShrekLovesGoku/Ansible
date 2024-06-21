@@ -1,61 +1,30 @@
 ---
-- name: Clone template and create VMs using Proxmox modules
+- name: Create and start VMs using Proxmox KVM module
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
   vars:
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: root@pam
-    api_password: Zli12345
-    api_host: 10.80.15.32
-    node: diego-proxmox-srv
-    template_id: 1000  # ID der Vorlage, die geklont werden soll
-    vm_start_id: 2000  # ID der ersten neuen VM
 
   tasks:
     - name: Clone the template to create multiple VMs
-      community.general.proxmox_template:
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-        node: "{{ node }}"
-        src: "{{ template_id }}"
-        template: false
-        state: present
-      loop: "{{ range(1, 4) }}"
-      loop_control:
-        index_var: vm_index
-      register: cloned_vms
-
-    - name: Print the cloned VM IDs
-      debug:
-        msg: "Cloned VM ID: {{ item }}"
-      loop: "{{ cloned_vms.results }}"
-      loop_control:
-        index_var: vm_index
-
-- name: Rename and start cloned VMs
-  hosts: PXEAnsibleDC-Proxmox
-  gather_facts: no
-
-  vars:
-    ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: root@pam
-    api_password: Zli12345
-    api_host: 10.80.15.32
-    node: diego-proxmox-srv
-    vm_start_id: 2000  # ID der ersten neuen VM
-
-  tasks:
-    - name: Rename and start the cloned VMs
       community.general.proxmox_kvm:
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-        node: "{{ node }}"
-        vmid: "{{ vm_start_id + vm_index }}"
-        name: "VM-auto-{{ '%04d'|format(vm_index + 1) }}"
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        node: diego-proxmox-srv
+        name: "VM-auto-{{ '%04d'|format(item) }}"
+        clone: true  # Cloning the existing template
+        template: 1000  # ID of the VM template
+        state: present
+      loop: "{{ range(1, 4) }}"  # Creates three VMs with numbers 1, 2, and 3
+
+    - name: Start the created VMs
+      community.general.proxmox_kvm:
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        node: diego-proxmox-srv
+        name: "VM-auto-{{ '%04d'|format(item) }}"
         state: started
-      loop: "{{ range(0, 3) }}"
-      loop_control:
-        index_var: vm_index
+      loop: "{{ range(1, 4) }}"  # Starts the three VMs created above
