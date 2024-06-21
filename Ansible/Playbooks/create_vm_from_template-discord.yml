@@ -50,7 +50,13 @@
 
     - name: Extract IP and MAC addresses of created VMs
       set_fact:
-        vm_info_list: "{{ vm_info.virtual_machines | map(attribute='name') | list }}"
+        vm_info_list: "{{ vm_info.virtual_machines | default([]) | map(attribute='name') | list }}"
+      when: vm_info.virtual_machines is defined
+
+    - name: "Fallback: Extract IP and MAC addresses from hostvars"
+      set_fact:
+        vm_info_list: "{{ vm_creation_results.results | map(attribute='ansible_loop_var') | list }}"
+      when: vm_info.virtual_machines is not defined
 
     - name: Send VM information to Discord channel
       community.general.discord:
