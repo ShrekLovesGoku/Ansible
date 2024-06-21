@@ -5,20 +5,25 @@
 
   vars:
     vm_count: 3  # Anzahl der zu erstellenden VMs
-    base_name: "VM-auto"
+    base_name: "vm-auto"
     starting_id: 2001  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+    api_user: "root@pam"
+    api_password: "Zli12345"
+    api_host: "10.80.15.32"
+    bridge_interface: "vmbr1"
 
   tasks:
     - name: Get list of existing VMs
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
-        api_user: root@pam
-        api_password: Zli12345
-        api_host: 10.80.15.32
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
         name: "{{ base_name }}-"  # Filtern nach VMs mit Namen, die mit base_name- beginnen
         state: present
       register: existing_vms
+      ignore_errors: true  # Ignoriere Fehler, wenn keine VMs gefunden wurden
 
     - name: Populate existing VM IDs list
       set_fact:
@@ -27,10 +32,10 @@
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
-        api_user: root@pam
-        api_password: Zli12345
-        api_host: 10.80.15.32
-        name: "vm-auto-{{ starting_id + item }}"
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
+        name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
@@ -38,9 +43,9 @@
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         net:
-          net0: 'virtio,bridge=vmbr1'
+          net0: 'virtio,bridge={{ bridge_interface }}'
         state: present  # Create the VM but do not start it
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-      when: "'vm-auto-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
+      when: "'{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
