@@ -16,7 +16,6 @@
         template: 1000  # ID des vorhandenen Templates, das kopiert werden soll
         vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
         name: "VM-auto-{{ '%04d'|format(item) }}"  # Name der neuen VM
-        full_clone: true
         state: present
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
 
