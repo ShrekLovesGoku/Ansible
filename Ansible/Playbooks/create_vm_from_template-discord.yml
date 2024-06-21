@@ -8,6 +8,7 @@
     base_name: "VM-auto"
     starting_id: 2035  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+    api_user: root@pam
     api_token_id: "root@pam"
     api_token_secret: "root@pam!pxeansibledc"  # Füge hier dein API-Token-Secret ein
     api_host: 10.80.15.32
@@ -18,6 +19,7 @@
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
+        api_user: "{{ api_user }}"
         api_host: "{{ api_host }}"
         api_token_id: "{{ api_token_id }}"
         api_token_secret: "{{ api_token_secret }}"
