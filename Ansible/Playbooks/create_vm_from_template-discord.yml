@@ -34,28 +34,33 @@
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
         state: started  # Create the VM but do not start it
-      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: item
       register: vm_creation_results
 
-    - name: Gather VM details for Discord message
-      community.general.proxmox_kvm:
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-        node: diego-proxmox-srv
-        vmid: "{{ starting_id + item }}"
-        state: info
-      register: new_vm_details
-      loop: "{{ range(1, vm_count + 1) | list }}"
+    - name: Pause to ensure VMs are created
+      pause:
+        seconds: 30
+
+    - name: Gather VM details from Proxmox API
+      uri:
+        url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/status/current"
+        method: GET
+        user: "{{ api_user }}"
+        password: "{{ api_password }}"
+        force_basic_auth: yes
+        validate_certs: no
+      register: vm_details
+      loop: "{{ range(0, vm_count) | list }}"
       loop_control:
         loop_var: item
+      changed_when: false
 
     - name: Collect VM network details
       set_fact:
-        vm_network_details: "{{ vm_network_details | default([]) + [{'name': new_vm_details.results[item].name, 'ip': new_vm_details.results[item].net0.ip, 'mac': new_vm_details.results[item].net0.macaddr}] }}"
-      loop: "{{ range(0, vm_count) | list }}"
+        vm_network_details: "{{ vm_network_details | default([]) + [{'name': item.name, 'ip': item.result.data.ip, 'mac': item.result.data.macaddr}] }}"
+      loop: "{{ vm_details.results }}"
       loop_control:
         loop_var: item
 
