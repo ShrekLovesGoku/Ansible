@@ -33,8 +33,8 @@
         scsihw: virtio-scsi-pci
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
-        state: started  # Create the VM but do not start it
-      loop: "{{ range(0, vm_count) | list }}"
+        state: present  # Create the VM but do not start it
+      loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
       register: vm_creation_results
