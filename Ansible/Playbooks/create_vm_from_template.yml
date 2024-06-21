@@ -7,14 +7,26 @@
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
 
   tasks:
-    - name: Create and start multiple VMs
+    - name: Clone a template to create multiple VMs
+      community.general.proxmox_template:
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        node: diego-proxmox-srv
+        template: 1000  # ID des vorhandenen Templates, das kopiert werden soll
+        vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
+        name: "VM-auto-{{ '%04d'|format(item) }}"  # Name der neuen VM
+        full_clone: true
+        state: present
+      loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
+
+    - name: Start the cloned VMs
       community.general.proxmox_kvm:
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
         node: diego-proxmox-srv
         name: "VM-auto-{{ '%04d'|format(item) }}"
-        clone: ubuntu-cloud  # Boolescher Wert für das Klonen der Vorlage
-        template: true  # ID der Vorlage als String angegeben
+        vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
         state: started
-      loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
+      loop: "{{ range(1, 4) }}"  # Startet die drei erstellten VMs
