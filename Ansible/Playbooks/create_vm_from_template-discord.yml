@@ -1,5 +1,5 @@
 ---
-- name: Create multiple VMs using Cloud-Init and DHCP configuration
+- name: Create and start multiple VMs using Cloud-Init and DHCP configuration
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
 
@@ -79,5 +79,5 @@
           {% for vm_name in vm_info_list %}
           Name: {{ vm_name }}
           IP Address: {{ hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'] }}
-          MAC Address: {{ hostvars[inventory_hostname]['ansible_' + 'enp0s3']['macaddress'] }}
+          MAC Address: {{ hostvars[inventory_hostname]['ansible_' + 'enp6s0']['macaddress'] }}
           {% endfor %}
