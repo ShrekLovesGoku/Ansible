@@ -30,7 +30,7 @@
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
-        name: "{{ base_name }}-{{ starting_id + item }}"
+        name: "VM-auto-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
@@ -43,4 +43,4 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-      when: "'{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
+      when: "'VM-auto-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
