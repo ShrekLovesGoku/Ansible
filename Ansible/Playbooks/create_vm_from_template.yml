@@ -1,6 +1,6 @@
 ---
 - name: Create and start VMs using Proxmox KVM module
-  hosts: localhost
+  hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
   vars:
