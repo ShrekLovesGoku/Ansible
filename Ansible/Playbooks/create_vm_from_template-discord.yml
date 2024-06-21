@@ -9,7 +9,7 @@
     starting_id: 2035  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: root@pam
-    api_token_id: "root@pam"
+    api_token_id: "pxeansibledc"
     api_token_secret: "root@pam!pxeansibledc"  # Füge hier dein API-Token-Secret ein
     api_host: 10.80.15.32
     bridge_interface: "vmbr1"
