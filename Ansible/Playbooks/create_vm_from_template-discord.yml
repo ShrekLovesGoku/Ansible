@@ -4,9 +4,9 @@
   gather_facts: false
 
   vars:
-    vm_count: 5
+    vm_count: 2
     base_name: "VM-auto"
-    starting_id: 2100
+    starting_id: 2107
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -40,14 +40,20 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Gather IP and MAC addresses of created VMs
+    - name: Gather VM information
       community.general.proxmox_vm_info:
         node: diego-proxmox-srv
         api_user: "{{ api_user }}"
         api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
-        vmids: "{{ vm_creation_results.results | map(attribute='vmid') | list }}"
       register: vm_info
+
+    - name: Extract IP and MAC addresses of created VMs
+      set_fact:
+        vm_info_list: "{{ vm_info.virtual_machines | map(attribute='name') | list }}"
+      loop: "{{ vm_creation_results.results }}"
+      loop_control:
+        loop_var: item
 
     - name: Send VM information to Discord channel
       community.general.discord:
@@ -56,8 +62,8 @@
         content: |
           VM creation completed successfully.
 
-          {% for vm in vm_info.virtual_machines %}
-          Name: {{ vm.name }}
-          IP Address: {{ vm.ip_address }}
-          MAC Address: {{ vm.mac_address }}
+          {% for vm_name in vm_info_list %}
+          Name: {{ vm_name }}
+          IP Address: {{ hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'] }}
+          MAC Address: {{ hostvars[inventory_hostname]['ansible_' + 'enp0s3']['macaddress'] }}
           {% endfor %}
