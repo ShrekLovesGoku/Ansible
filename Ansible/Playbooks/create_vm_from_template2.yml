@@ -1,5 +1,5 @@
 ---
-- name: Create multiple VMs using Cloud-Init and DHCP configuration
+- name: Create multiple VMs using Cloud-Init with SCSI disk and DHCP configuration
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
 
@@ -24,8 +24,11 @@
         ide:
           ide2: 'local:cloudinit,format=qcow2'
         scsihw: virtio-scsi-pci  # Specify SCSI controller type
-        scsi: true  # Enable SCSI disk
-        size: 10G  # Specify size of the SCSI disk (e.g., 10G for 10 GB)
+        disks:
+          - size: 10G  # Specify size of the SCSI disk (e.g., 10G for 10 GB)
+            type: scsi  # Specify disk type as SCSI
+            storage: local  # Specify storage type (e.g., local storage)
+            format: qcow2  # Specify disk format
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         sshkeys: "{{ ssh_keys }}"
@@ -37,5 +40,3 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-
-    
