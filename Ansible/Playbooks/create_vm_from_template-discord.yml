@@ -40,6 +40,17 @@
         loop_var: item
       register: vm_creation_results
 
+    - name: Start the created VMs
+      community.general.proxmox_vm:
+        node: diego-proxmox-srv
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
+        vmid: "{{ item.vmid }}"
+        state: started
+      loop: "{{ vm_creation_results.results }}"
+      when: item.changed
+
     - name: Gather VM information
       community.general.proxmox_vm_info:
         node: diego-proxmox-srv
