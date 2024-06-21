@@ -1,5 +1,5 @@
 ---
-- name: Clone template and create VMs using Proxmox KVM module
+- name: Clone template and create VMs using Proxmox modules
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
@@ -10,6 +10,7 @@
     api_host: 10.80.15.32
     node: diego-proxmox-srv
     template_id: 1000  # ID der Vorlage, die geklont werden soll
+    vm_start_id: 2000  # ID der ersten neuen VM
 
   tasks:
     - name: Clone the template to create multiple VMs
@@ -19,19 +20,42 @@
         api_host: "{{ api_host }}"
         node: "{{ node }}"
         src: "{{ template_id }}"
-        vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
-        name: "VM-auto-{{ '%04d'|format(item) }}"
-        template: false  # Die geklonte VM soll kein Template sein
+        template: false
         state: present
       loop: "{{ range(1, 4) }}"
+      loop_control:
+        index_var: vm_index
+      register: cloned_vms
 
-    - name: Start the cloned VMs
+    - name: Print the cloned VM IDs
+      debug:
+        msg: "Cloned VM ID: {{ item }}"
+      loop: "{{ cloned_vms.results }}"
+      loop_control:
+        index_var: vm_index
+
+- name: Rename and start cloned VMs
+  hosts: PXEAnsibleDC-Proxmox
+  gather_facts: no
+
+  vars:
+    ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+    api_user: root@pam
+    api_password: Zli12345
+    api_host: 10.80.15.32
+    node: diego-proxmox-srv
+    vm_start_id: 2000  # ID der ersten neuen VM
+
+  tasks:
+    - name: Rename and start the cloned VMs
       community.general.proxmox_kvm:
         api_user: "{{ api_user }}"
         api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
         node: "{{ node }}"
-        name: "VM-auto-{{ '%04d'|format(item) }}"
-        vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
+        vmid: "{{ vm_start_id + vm_index }}"
+        name: "VM-auto-{{ '%04d'|format(vm_index + 1) }}"
         state: started
-      loop: "{{ range(1, 4) }}"
+      loop: "{{ range(0, 3) }}"
+      loop_control:
+        index_var: vm_index
