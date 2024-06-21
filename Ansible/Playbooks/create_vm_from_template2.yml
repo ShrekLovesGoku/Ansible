@@ -12,7 +12,7 @@
     api_password: "Zli12345"
     api_host: "10.80.15.32"
     bridge_interface: "vmbr1"
-    slack_webhook: "https://hooks.slack.com/services/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"  # Slack Webhook URL hier einfügen
+    slack_webhook: "https://hooks.slack.com/services/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"  # Slack Webhook URL hier einfügen
 
   tasks:
     - name: Create new VM using Cloud-Init and DHCP configuration
