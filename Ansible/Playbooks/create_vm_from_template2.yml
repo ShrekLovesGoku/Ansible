@@ -39,18 +39,18 @@
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
-        scsihw: virtio-scsi-pci
+        scsihw: virtio-scsi-pci  # Specify SCSI controller type
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         net:
-          net0: 'virtio,bridge={{ bridge_interface }}'
+          net0: 'virtio,bridge=vmbr1'
         state: present  # Create the VM but do not start it
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
