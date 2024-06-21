@@ -1,0 +1,75 @@
+---
+- name: Create multiple VMs using Cloud-Init and DHCP configuration
+  hosts: PXEAnsibleDC-Proxmox
+  gather_facts: false
+
+  vars:
+    vm_count: 5  # Anzahl der zu erstellenden VMs
+    base_name: "VM-auto"
+    starting_id: 2022  # Start-ID für die VMs
+    ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
+    api_user: "root@pam"
+    api_password: "Zli12345"
+    api_host: "10.80.15.32"
+    bridge_interface: "vmbr1"
+    discord_webhook_url: "https://discord.com/api/webhooks/1253674735649161247/vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
+
+  tasks:
+    - name: Create new VM using Cloud-Init and DHCP configuration
+      community.general.proxmox_kvm:
+        node: diego-proxmox-srv
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
+        name: "{{ base_name }}-{{ starting_id + item }}"
+        vmid: "{{ starting_id + item }}"
+        ide:
+          ide2: 'local:cloudinit,format=qcow2'
+        ipconfig: '{"ipconfig0": "ip=dhcp"}'
+        cores: 3
+        memory: 2048
+        scsi: scsi='{"WDC-1TB_sda-HDD:16,format=qcow2"}'
+        bios: ovmf
+        scsihw: virtio-scsi-pci
+        net:
+          net0: 'virtio,bridge={{ bridge_interface }}'
+        state: present  # Create the VM but do not start it
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+      register: vm_creation_results
+
+    - name: Gather VM details for Discord message
+      community.general.proxmox_kvm:
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
+        node: diego-proxmox-srv
+        vmid: "{{ starting_id + item }}"
+        state: info
+      register: new_vm_details
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+
+    - name: Collect VM network details
+      set_fact:
+        vm_network_details: "{{ vm_network_details | default([]) + [{'name': new_vm_details.results[item].name, 'ip': new_vm_details.results[item].net0.ip, 'mac': new_vm_details.results[item].net0.macaddr}] }}"
+      loop: "{{ range(0, vm_count) | list }}"
+      loop_control:
+        loop_var: item
+
+    - debug:
+        var: vm_network_details
+
+    - name: Send Discord message with VM details
+      uri:
+        url: "{{ discord_webhook_url }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+        body_format: json
+        body: >
+          {
+            "content": "New VMs have been created:\n{% for vm in vm_network_details %}Name: {{ vm.name }}, IP: {{ vm.ip }}, MAC: {{ vm.mac }}\n{% endfor %}"
+          }
