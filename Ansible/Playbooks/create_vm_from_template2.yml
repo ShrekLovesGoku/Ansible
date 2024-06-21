@@ -40,7 +40,7 @@
       when: vm_creation_results is succeeded
       community.general.slack:
         token: "xoxe.xoxp-1-Mi0yLTEzMDE2NDAwNTQ2MjctNTgwNTI4MjYzMzM5My03MjY0MTQ2MjIyNTAyLTczMTQwODM0ODAwODQtMzA0ODE3NjFmY2NhZTIxNjBmNzUyYjFmMmY4NzJiMzQ0MWFlNmM4MGNhZmYxMmI5NjY0MmQyZmExNzQ1NjAwNA"
-        channel: "#channel-name"  # Name des Slack-Channels hier einfügen
+        channel: "#pxeansibledc"  # Name des Slack-Channels hier einfügen
         msg: |
           New VMs have been created:
           {% for result in vm_creation_results.results %}
