@@ -51,9 +51,6 @@
     - name: Extract IP and MAC addresses of created VMs
       set_fact:
         vm_info_list: "{{ vm_info.virtual_machines | map(attribute='name') | list }}"
-      loop: "{{ vm_creation_results.results }}"
-      loop_control:
-        loop_var: item
 
     - name: Send VM information to Discord channel
       community.general.discord:
