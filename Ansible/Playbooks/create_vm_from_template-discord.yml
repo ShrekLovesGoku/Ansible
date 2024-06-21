@@ -8,8 +8,8 @@
     base_name: "VM-auto"
     starting_id: 2035  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: root@pam
-    api_token: "root@pam!mytoken=e06dac6c-0c64-4166-9002-3342132e080a"  # Füge deinen API-Token hier ein
+    api_token_id: "root@pam"
+    api_token_secret: "root@pam!pxeansibledc"  # Füge hier dein API-Token-Secret ein
     api_host: 10.80.15.32
     bridge_interface: "vmbr1"
     discord_webhook_url: "https://discord.com/api/webhooks/1253674735649161247/vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
@@ -19,8 +19,8 @@
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
         api_host: "{{ api_host }}"
-        api_user: "{{ api_user }}"
-        api_token_id: "{{ api_token }}"
+        api_token_id: "{{ api_token_id }}"
+        api_token_secret: "{{ api_token_secret }}"
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
@@ -48,7 +48,7 @@
         url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/config"
         method: GET
         headers:
-          Authorization: "PVEAPIToken={{ api_token }}"
+          Authorization: "PVEAPIToken={{ api_token_id }}={{ api_token_secret }}"
         validate_certs: no
       register: vm_details
       loop: "{{ range(1, vm_count + 1) | list }}"
