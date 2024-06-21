@@ -32,10 +32,10 @@
 
     - name: Create new VM using Cloud-Init with provided configuration
       ansible.builtin.proxmox_kvm:
-        node: sabrewulf
+        node: diego-proxmox-srv
         api_user: root@pam
-        api_password: secret
-        api_host: helldorado
+        api_password: Zli12345
+        api_host: 10.80.15.32
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
