@@ -1,0 +1,40 @@
+- name: Create multiple VMs using Cloud-Init and DHCP configuration
+  hosts: PXEAnsibleDC-Proxmox  # Da die Aktion auf dem Controller ausgeführt wird
+  gather_facts: false  # Keine Fakten über den Host sammeln
+
+  vars:
+    vm_count: 3  # Anzahl der zu erstellenden VMs
+    base_name: "VM-auto"
+    starting_id: 2001  # Start-ID für die VMs
+
+  tasks:
+    - name: Loop through to create VMs
+      ansible.builtin.include_tasks: create_vm.yml
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: vm_index
+        index_var: vm_id
+
+    - name: Start all created VMs
+      ansible.builtin.proxmox_kvm:
+        node: diego-proxmox-srv
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        name: "{{ base_name }}-{{ starting_id + vm_id }}"
+        vmid: "{{ starting_id + vm_id }}"
+        ide:
+          ide2: 'local:cloudinit,format=qcow2'
+        ciuser: "user{{ vm_id }}"
+        cipassword: "password{{ vm_id }}"
+        net:
+          net0: 'virtio,bridge=vmbr1'
+        ipconfig:
+          ipconfig0: 'dhcp'  # Set the first network interface to DHCP
+        sshkeys:
+          - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjsmQjgLKrc+WsVtn1BF+s5NE/++1JKlYEt0hUe5UR0pw/SlIjpJBLr6/S275Qf20QshBc28Kz3j7JyvGa2FVGMrESvLl8F0V7Zba+ypE5E86Gqij8efwf54Gl/BFhvFxsIi/URmlJdT+9vz0GDYAySUBqooIowbnvX8QKiO54qTixdSRBw2DQG5dNN4jbnGrVbhYI16iQ3g5E7NaB382Z9+gfoJTFWYVR1NyiZnzrIL9T6pWdWpcG5t3ZKPq7FPp7DOI0pD8EPFTXqG8HfVzfk1Tk7SyzIqq9RQGa1ePeui1xaR+Vu9B8oqqph7gSXc6EqKiYpMMeLwNrNVZh/RR5ecglHUmqJoQ9JlgsvDnJmEjgPC8aO04UlI/cjIkRG30kthX3UtOv75eszOSWBgpLlvwkty/QB6va1wpPQug5JC0jW6/G9s09dTVPLbGZaOcg9EDBOmaBAb98pGeLlDsSc0ArcfDcGMXOewhSj7PG9uRKcg7AA81i/FoMDUsaykFuD2GaS/egMXWanYIrou4LljRl3MwjDKrY3YZbL1ywwg09bVEMijBdk5bGSZgiyJ26lQDdXiMr9v+k45NGwroP0Kmo4K3fKwNE/cGGO08eCsOV9BVPqX734pBHUkDwtjq0uZ+YG7wpdeNOH5TamJ4fUbHRZ4YPcHcYj/3LdguqRQ== root@diego-proxmox-srv'
+          - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGyGcs9d+jS/8bCkEwT71UJ44qTDENHgDvbxSdF6yzazrzfn11jAByxIgyKbPc0OmcXS6FrHoYnotAljJUeSwj7Cp0AoVhbiftE5f2NNFsJry6t9Ke9npe92UByhmJfLfDo06u+RTi/Bb9GWp8WMO2rxPE49gYOiIOZCbYFON3VNVmotfmVCxE9Me+/TgN4N8AsKQVqjLPATMhseWx7JQRJ1ZuUiG1eGaW+08Lc7NxpS28EMnf56/a0NPQnQcqO89IITPaijMG96v7sU97lbPwGG6tXcSDC8pBL8kSHozHbZWKmCdAVSDuirnjBEBZpBjnbUiWVqLw1Xay1oaLM0PPXNOTb8OzVeDBFsN+B1WPpvPHPh+PwwSnkSV2lSi48/z2A3ue5A0FQEdXYeHg7NoKVQ4cAyR698DLywr0cqAbei2z745fvXgH748mq0Fcz1gflClQh70RCzcEmN0KFNbjRpP/BwIBM9UiGjSZUnBV29upakHhvneE5cPPlG/g8H0= root@Ansible-CT-01'  # Hier kannst du weitere SSH-Keys hinzufügen
+        state: started
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: vm_id
