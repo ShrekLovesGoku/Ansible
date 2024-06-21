@@ -16,6 +16,7 @@
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
+        name: "{{ base_name }}-"  # Filtern nach VMs mit Namen, die mit base_name- beginnen
         state: present
       register: existing_vms
 
