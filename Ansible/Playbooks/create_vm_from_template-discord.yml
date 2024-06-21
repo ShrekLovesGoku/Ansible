@@ -22,8 +22,8 @@
         api_user: "{{ api_user }}"
         api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
-        name: "{{ base_name }}-{{ starting_id + item }}"
-        vmid: "{{ starting_id + item }}"
+        name: "{{ base_name }}-{{ starting_id + (item | int) }}"
+        vmid: "{{ starting_id + (item | int) }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
@@ -42,7 +42,7 @@
 
     - name: Gather IP and MAC addresses of created VMs
       set_fact:
-        vm_info_list: "{{ vm_info_list | default([]) + [{'name': base_name + '-' + (starting_id + item - 1 | string), 'ip_address': hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'], 'mac_address': hostvars[inventory_hostname]['ansible_' + 'enp0s3']['macaddress']}] }}"
+        vm_info_list: "{{ vm_info_list | default([]) + [{'name': base_name + '-' + (starting_id + (item | int) - 1 | string), 'ip_address': hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'], 'mac_address': hostvars[inventory_hostname]['ansible_' + 'enp0s3']['macaddress']}] }}"
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
