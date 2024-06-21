@@ -13,27 +13,6 @@
       - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjsmQjgLKrc+WsVtn1BF+s5NE/++1JKlYEt0hUe5UR0pw/SlIjpJBLr6/S275Qf20QshBc28Kz3j7JyvGa2FVGMrESvLl8F0V7Zba+ypE5E86Gqij8efwf54Gl/BFhvFxsIi/URmlJdT+9vz0GDYAySUBqooIowbnvX8QKiO54qTixdSRBw2DQG5dNN4jbnGrVbhYI16iQ3g5E7NaB382Z9+gfoJTFWYVR1NyiZnzrIL9T6pWdWpcG5t3ZKPq7FPp7DOI0pD8EPFTXqG8HfVzfk1Tk7SyzIqq9RQGa1ePeui1xaR+Vu9B8oqqph7gSXc6EqKiYpMMeLwNrNVZh/RR5ecglHUmqJoQ9JlgsvDnJmEjgPC8aO04UlI/cjIkRG30kthX3UtOv75eszOSWBgpLlvwkty/QB6va1wpPQug5JC0jW6/G9s09dTVPLbGZaOcg9EDBOmaBAb98pGeLlDsSc0ArcfDcGMXOewhSj7PG9uRKcg7AA81i/FoMDUsaykFuD2GaS/egMXWanYIrou4LljRl3MwjDKrY3YZbL1ywwg09bVEMijBdk5bGSZgiyJ26lQDdXiMr9v+k45NGwroP0Kmo4K3fKwNE/cGGO08eCsOV9BVPqX734pBHUkDwtjq0uZ+YG7wpdeNOH5TamJ4fUbHRZ4YPcHcYj/3LdguqRQ== root@diego-proxmox-srv"
 
   tasks:
-    - name: Loop through to create VMs
-      ansible.builtin.proxmox_kvm:
-        node: diego-proxmox-srv
-        api_user: root@pam
-        api_password: Zli12345
-        api_host: 10.80.15.32
-        name: "{{ base_name }}-{{ starting_id + item }}"
-        vmid: "{{ starting_id + item }}"
-        ide:
-          ide2: 'local:cloudinit,format=qcow2'
-        ciuser: "user{{ starting_id + item }}"
-        cipassword: "password{{ starting_id + item }}"
-        sshkeys: "{{ ssh_keys }}"
-        net:
-          net0: 'virtio,bridge=vmbr1'
-        ipconfig:
-          ipconfig0: 'dhcp'  # Set the first network interface to DHCP
-        state: started
-      loop: "{{ range(1, vm_count + 1) | list }}"
-      loop_control:
-        loop_var: item
 
     - name: Create new VM using Cloud-Init with provided configuration
       ansible.builtin.proxmox_kvm:
@@ -56,3 +35,27 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
+
+    - name: Loop through to create VMs
+      ansible.builtin.proxmox_kvm:
+        node: diego-proxmox-srv
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        name: "{{ base_name }}-{{ starting_id + item }}"
+        vmid: "{{ starting_id + item }}"
+        ide:
+          ide2: 'local:cloudinit,format=qcow2'
+        ciuser: "user{{ starting_id + item }}"
+        cipassword: "password{{ starting_id + item }}"
+        sshkeys: "{{ ssh_keys }}"
+        net:
+          net0: 'virtio,bridge=vmbr1'
+        ipconfig:
+          ipconfig0: 'dhcp'  # Set the first network interface to DHCP
+        state: started
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+
+    
