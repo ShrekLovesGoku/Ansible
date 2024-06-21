@@ -19,12 +19,12 @@
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
-        name: "{{ base_name }}-{{ starting_id + loop.index }}"
-        vmid: "{{ starting_id + loop.index }}"
+        name: "{{ base_name }}-{{ starting_id + item }}"
+        vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
-        ciuser: "user{{ starting_id + loop.index }}"
-        cipassword: "password{{ starting_id + loop.index }}"
+        ciuser: "user{{ starting_id + item }}"
+        cipassword: "password{{ starting_id + item }}"
         sshkeys: "{{ ssh_keys }}"
         net:
           net0: 'virtio,bridge=vmbr1'
@@ -41,12 +41,12 @@
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
-        name: "{{ base_name }}-{{ starting_id + loop.index }}"
-        vmid: "{{ starting_id + loop.index }}"
+        name: "{{ base_name }}-{{ starting_id + item }}"
+        vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
-        ciuser: "user{{ starting_id + loop.index }}"
-        cipassword: "password{{ starting_id + loop.index }}"
+        ciuser: "user{{ starting_id + item }}"
+        cipassword: "password{{ starting_id + item }}"
         sshkeys: "{{ ssh_keys }}"
         net:
           net0: 'virtio,bridge=vmbr1'
