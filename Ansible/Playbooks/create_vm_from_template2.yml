@@ -1,6 +1,6 @@
 ---
 - name: Create multiple VMs using Cloud-Init and DHCP configuration
-  hosts: PYEAnsibleDC-Proxmox  # Da die Aktion auf dem Controller ausgeführt wird
+  hosts: PXEAnsibleDC-Proxmox  # Da die Aktion auf dem Controller ausgeführt wird
   gather_facts: false  # Keine Fakten über den Host sammeln
 
   vars:
