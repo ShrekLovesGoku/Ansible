@@ -1,34 +1,28 @@
 ---
-- name: Create and start VMs using Proxmox KVM module
+- name: Create and start VMs using Proxmox VM module
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: no
 
   vars:
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    template_id: 1000  # Die ID der Vorlage
+    template_id: 1000  # Die ID des Vorlagen-VMs
     vm_count: 3  # Anzahl der zu erstellenden VMs
 
   tasks:
     - name: Clone the template to create multiple VMs
-      community.general.proxmox_kvm:
+      community.general.proxmox_vm:
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
         node: diego-proxmox-srv
-        name: "VM-auto-{{ '%04d'|format(item) }}"
-        clone: true  # Cloning the existing template
-        full_clone: true
         vmid: "{{ 1100 + item }}"  # Neue VM-IDs für die geklonten VMs
-        template: false  # Sicherstellen, dass die neue VM keine Vorlage ist
-        disk: 32G  # Beispiel: Diskgröße der neuen VMs
-        memory: 2048  # Beispiel: Arbeitsspeicher der neuen VMs (in MiB)
-        cores: 2  # Beispiel: Anzahl der vCPUs der neuen VMs
-        source: "{{ template_id }}"  # ID der VM-Vorlage
+        name: "VM-auto-{{ '%04d'|format(item) }}"
+        clone: "{{ template_id }}"
         state: present
       loop: "{{ range(1, vm_count + 1) }}"  # Erstellt VMs mit fortlaufenden Nummern
 
     - name: Start the created VMs
-      community.general.proxmox_kvm:
+      community.general.proxmox_vm:
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
