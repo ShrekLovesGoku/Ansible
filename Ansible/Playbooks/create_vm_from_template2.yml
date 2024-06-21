@@ -25,6 +25,11 @@
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
+        ipconfig: 'dhcp'
+        cores: 3
+        memory: 2048
+        scsi: '{"WDC-1TB_sda-HDD:16,format=qcow2"}'
+        bios: ovmf
         scsihw: virtio-scsi-pci
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
