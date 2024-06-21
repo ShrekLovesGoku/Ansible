@@ -8,9 +8,21 @@
     base_name: "VM-auto"
     starting_id: 2001  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    
 
   tasks:
+    - name: Get list of existing VMs
+      community.general.proxmox_kvm:
+        node: diego-proxmox-srv
+        api_user: root@pam
+        api_password: Zli12345
+        api_host: 10.80.15.32
+        state: present
+      register: existing_vms
+
+    - name: Populate existing VM IDs list
+      set_fact:
+        existing_vmid_list: "{{ existing_vms.virtual_machines | map(attribute='vmid') | list }}"
+
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
@@ -30,3 +42,4 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
+      when: "'{{ starting_id + item }}' not in existing_vmid_list | map('string')"
