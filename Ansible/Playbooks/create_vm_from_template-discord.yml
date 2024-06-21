@@ -10,7 +10,7 @@
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
-    api_host: "10.80.15.32"
+    api_host: 10.80.15.32
     bridge_interface: "vmbr1"
     discord_webhook_url: "https://discord.com/api/webhooks/1253674735649161247/vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
 
@@ -42,20 +42,6 @@
     - name: Pause to ensure VMs are created
       pause:
         seconds: 30
-
-    - name: Gather VM details from Proxmox API
-      uri:
-        url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/status/current"
-        method: GET
-        user: "{{ api_user }}"
-        password: "{{ api_password }}"
-        force_basic_auth: yes
-        validate_certs: no
-      register: vm_details
-      loop: "{{ range(0, vm_count) | list }}"
-      loop_control:
-        loop_var: item
-      changed_when: false
 
     - name: Collect VM network details
       set_fact:
