@@ -40,8 +40,22 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Send a message to the Discord channel
+    - name: Gather IP and MAC addresses of created VMs
+      set_fact:
+        vm_info_list: "{{ vm_info_list | default([]) + [{'name': base_name + '-' + (starting_id + item - 1 | string), 'ip_address': hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'], 'mac_address': hostvars[inventory_hostname]['ansible_' + 'enp0s3']['macaddress']}] }}"
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+
+    - name: Send VM information to Discord channel
       community.general.discord:
         webhook_id: "{{ discord_webhook_id }}"
         webhook_token: "{{ discord_webhook_token }}"
-        content: "VM creation completed successfully."
+        content: |
+          VM creation completed successfully.
+
+          {% for vm in vm_info_list %}
+          Name: {{ vm.name }}
+          IP Address: {{ vm.ip_address }}
+          MAC Address: {{ vm.mac_address }}
+          {% endfor %}
