@@ -31,7 +31,7 @@
     - name: Populate existing VM IDs list
       set_fact:
         existing_vmid_list: "{{ existing_vms.virtual_machines | map(attribute='vmid') | list }}"
-      when: existing_vms is defined and existing_vms.virtual_machines is defined  # Sicherstellen, dass existing_vms und virtual_machines definiert sind
+      when: existing_vms is defined and existing_vms.virtual_machines is defined
 
     - debug:
         var: existing_vmid_list  # Debugging-Ausgabe zur Überprüfung der vorhandenen VM-IDs
@@ -46,7 +46,7 @@
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
-        scsihw: virtio-scsi-pci  # Specify SCSI controller type
+        scsihw: virtio-scsi-pci
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         net:
@@ -55,4 +55,5 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-      when: "'{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
+      when: existing_vms is not defined or existing_vms.virtual_machines | map(attribute='name') | list | count == 0 or ('{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list)
+
