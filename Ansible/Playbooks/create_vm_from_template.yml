@@ -1,6 +1,6 @@
 ---
 - name: Create and start VMs using Proxmox KVM module
-  hosts: PXEAnsibleDC-Proxmox
+  hosts: localhost
   gather_facts: no
 
   vars:
@@ -8,15 +8,16 @@
 
   tasks:
     - name: Clone a template to create multiple VMs
-      community.general.proxmox_template:
+      community.general.proxmox_kvm:
         api_user: root@pam
         api_password: Zli12345
         api_host: 10.80.15.32
         node: diego-proxmox-srv
-        template: 1000  # ID des vorhandenen Templates, das kopiert werden soll
+        name: "VM-auto-{{ '%04d'|format(item) }}"
         vmid: "{{ 2000 + item }}"  # ID der neuen VM, z.B. 2001, 2002, 2003
-        name: "VM-auto-{{ '%04d'|format(item) }}"  # Name der neuen VM
-        full_clone: true
+        clone: true  # Boolescher Wert für das Klonen der Vorlage
+        full_clone: true  # Optional, falls du einen vollständigen Klon erstellen möchtest
+        template: 1000  # ID der Vorlage
         state: present
       loop: "{{ range(1, 4) }}"  # Erstellt drei VMs mit den Nummern 1, 2 und 3
 
