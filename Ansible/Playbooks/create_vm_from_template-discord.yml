@@ -4,9 +4,9 @@
   gather_facts: false
 
   vars:
-    vm_count: 5  # Anzahl der zu erstellenden VMs
+    vm_count: 2  # Anzahl der zu erstellenden VMs
     base_name: "VM-auto"
-    starting_id: 2022  # Start-ID für die VMs
+    starting_id: 2030  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
