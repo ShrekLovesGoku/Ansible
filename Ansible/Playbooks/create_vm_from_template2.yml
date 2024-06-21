@@ -8,8 +8,7 @@
     base_name: "VM-auto"
     starting_id: 2001  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    ssh_keys:
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGyGcs9d+jS/8bCkEwT71UJ44qTDENHgDvbxSdF6yzazrzfn11jAByxIgyKbPc0OmcXS6FrHoYnotAljJUeSwj7Cp0AoVhbiftE5f2NNFsJry6t9Ke9npe92UByhmJfLfDo06u+RTi/Bb9GWp8WMO2rxPE49gYOiIOZCbYFON3VNVmotfmVCxE9Me+/TgN4N8AsKQVqjLPATMhseWx7JQRJ1ZuUiG1eGaW+08Lc7NxpS28EMnf56/a0NPQnQcqO89IITPaijMG96v7sU97lbPwGG6tXcSDC8pBL8kSHozHbZWKmCdAVSDuirnjBEBZpBjnbUiWVqLw1Xay1oaLM0PPXNOTb8OzVeDBFsN+B1WPpvPHPh+PwwSnkSV2lSi48/z2A3ue5A0FQEdXYeHg7NoKVQ4cAyR698DLywr0cqAbei2z745fvXgH748mq0Fcz1gflClQh70RCzcEmN0KFNbjRpP/BwIBM9UiGjSZUnBV29upakHhvneE5cPPlG/g8H0= root@Ansible-CT-01"
+    
 
   tasks:
     - name: Create new VM using Cloud-Init and DHCP configuration
@@ -25,7 +24,6 @@
         scsihw: virtio-scsi-pci  # Specify SCSI controller type
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
-        sshkeys: "{{ ssh_keys }}"
         net:
           net0: 'virtio,bridge=vmbr1'
         state: present  # Create the VM but do not start it
