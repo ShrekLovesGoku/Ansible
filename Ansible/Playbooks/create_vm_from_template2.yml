@@ -43,4 +43,4 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-      when: "'{{ starting_id + item }}' not in existing_vmid_list | map('string')"
+      when: "'{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list"
