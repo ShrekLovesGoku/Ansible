@@ -28,7 +28,7 @@
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
         cores: 3
         memory: 2048
-        scsi: '{"WDC-1TB_sda-HDD:16,format=qcow2"}'
+        scsi: scsi='{"WDC-1TB_sda-HDD:16,format=qcow2"}'
         bios: ovmf
         scsihw: virtio-scsi-pci
         ciuser: "user{{ starting_id + item }}"
