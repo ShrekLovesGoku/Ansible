@@ -4,25 +4,23 @@
   gather_facts: false
 
   vars:
-    vm_count: 2  # Anzahl der zu erstellenden VMs
+    vm_count: 5  # Anzahl der zu erstellenden VMs
     base_name: "VM-auto"
-    starting_id: 2035  # Start-ID für die VMs
+    starting_id: 2007  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: root@pam
-    api_token_id: "pxeansibledc"
-    api_token_secret: "root@pam!pxeansibledc"  # Füge hier dein API-Token-Secret ein
-    api_host: 10.80.15.32
+    api_user: "root@pam"
+    api_password: "Zli12345"
+    api_host: "10.80.15.32"
     bridge_interface: "vmbr1"
-    discord_webhook_url: "https://discord.com/api/webhooks/1253674735649161247/vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
+    
 
   tasks:
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
         api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
-        api_token_id: "{{ api_token_id }}"
-        api_token_secret: "{{ api_token_secret }}"
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
@@ -41,41 +39,8 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Pause to ensure VMs are created
-      pause:
-        seconds: 30
-
-    - name: Gather VM details from Proxmox API
-      uri:
-        url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/config"
-        method: GET
-        headers:
-          Authorization: "PVEAPIToken={{ api_token_id }}={{ api_token_secret }}"
-        validate_certs: no
-      register: vm_details
-      loop: "{{ range(1, vm_count + 1) | list }}"
-      loop_control:
-        loop_var: item
-      changed_when: false
-
-    - name: Collect VM network details
-      set_fact:
-        vm_network_details: "{{ vm_network_details | default([]) + [{'name': item.name, 'ip': vm_details.results[item-1].json.ipconfig.ip, 'mac': vm_details.results[item-1].json.net0.macaddr}] }}"
-      loop: "{{ range(1, vm_count + 1) | list }}"
-      loop_control:
-        loop_var: item
-
-    - debug:
-        var: vm_network_details
-
-    - name: Send Discord message with VM details
-      uri:
-        url: "{{ discord_webhook_url }}"
-        method: POST
-        headers:
-          Content-Type: "application/json"
-        body_format: json
-        body: >
-          {
-            "content": "New VMs have been created:\n{% for vm in vm_network_details %}Name: {{ vm.name }}, IP: {{ vm.ip }}, MAC: {{ vm.mac }}\n{% endfor %}"
-          }
+    - name: Send a message to the Discord channel
+      community.general.discord:
+          webhook_id: "https://discord.com/api/webhooks/1253674735649161247"
+          webhook_token: "vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
+          content: "This is a message from ansible"
