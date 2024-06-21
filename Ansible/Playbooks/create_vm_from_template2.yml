@@ -25,11 +25,18 @@
       register: existing_vms
       ignore_errors: true  # Ignoriere Fehler, wenn keine VMs gefunden wurden
 
+    - debug:
+        var: existing_vms  # Debugging-Ausgabe zur Überprüfung der Struktur von existing_vms
+
     - name: Populate existing VM IDs list
       set_fact:
         existing_vmid_list: "{{ existing_vms.virtual_machines | map(attribute='vmid') | list }}"
+      when: existing_vms is defined  # Sicherstellen, dass existing_vms definiert ist
 
-    - name: Create new VM using Cloud-Init and DHCP configuration
+    - debug:
+        var: existing_vmid_list  # Debugging-Ausgabe zur Überprüfung der vorhandenen VM-IDs
+
+    - name: Create new VM 
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
         api_user: "{{ api_user }}"
