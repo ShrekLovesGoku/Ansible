@@ -6,7 +6,7 @@
   vars:
     vm_count: 2  # Anzahl der zu erstellenden VMs
     base_name: "VM-auto"
-    starting_id: 2030  # Start-ID für die VMs
+    starting_id: 2035  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -43,10 +43,24 @@
       pause:
         seconds: 30
 
+    - name: Gather VM details from Proxmox API
+      uri:
+        url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/config"
+        method: GET
+        user: "{{ api_user }}"
+        password: "{{ api_password }}"
+        force_basic_auth: yes
+        validate_certs: no
+      register: vm_details
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+      changed_when: false
+
     - name: Collect VM network details
       set_fact:
-        vm_network_details: "{{ vm_network_details | default([]) + [{'name': item.name, 'ip': item.result.data.ip, 'mac': item.result.data.macaddr}] }}"
-      loop: "{{ vm_details.results }}"
+        vm_network_details: "{{ vm_network_details | default([]) + [{'name': item.name, 'ip': vm_details.results[item-1].json.ipconfig.ip, 'mac': vm_details.results[item-1].json.net0.macaddr}] }}"
+      loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
 
