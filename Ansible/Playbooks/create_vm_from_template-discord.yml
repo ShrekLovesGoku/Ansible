@@ -8,8 +8,7 @@
     base_name: "VM-auto"
     starting_id: 2035  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: "root@pam"
-    api_password: "Zli12345"
+    api_token: "root@pam!mytoken=e06dac6c-0c64-4166-9002-3342132e080a"  # Füge deinen API-Token hier ein
     api_host: 10.80.15.32
     bridge_interface: "vmbr1"
     discord_webhook_url: "https://discord.com/api/webhooks/1253674735649161247/vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
@@ -18,9 +17,8 @@
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
+        api_token_id: "{{ api_token }}"
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
@@ -47,9 +45,8 @@
       uri:
         url: "https://{{ api_host }}:8006/api2/json/nodes/diego-proxmox-srv/qemu/{{ starting_id + item }}/config"
         method: GET
-        user: "{{ api_user }}"
-        password: "{{ api_password }}"
-        force_basic_auth: yes
+        headers:
+          Authorization: "PVEAPIToken={{ api_token }}"
         validate_certs: no
       register: vm_details
       loop: "{{ range(1, vm_count + 1) | list }}"
