@@ -5,37 +5,12 @@
 
   vars:
     vm_count: 3  # Anzahl der zu erstellenden VMs
-    base_name: "vm-auto"
+    base_name: "VM-auto"
     starting_id: 2001  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    api_user: "root@pam"
-    api_password: "Zli12345"
-    api_host: "10.80.15.32"
-    bridge_interface: "vmbr1"
+    
 
   tasks:
-    - name: Get list of existing VMs
-      community.general.proxmox_kvm:
-        node: diego-proxmox-srv
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-        name: "{{ base_name }}-"  # Filtern nach VMs mit Namen, die mit base_name- beginnen
-        state: present
-      register: existing_vms
-      ignore_errors: true  # Ignoriere Fehler, wenn keine VMs gefunden wurden
-
-    - debug:
-        var: existing_vms  # Debugging-Ausgabe zur Überprüfung der Struktur von existing_vms
-
-    - name: Populate existing VM IDs list
-      set_fact:
-        existing_vmid_list: "{{ existing_vms.virtual_machines | map(attribute='vmid') | list }}"
-      when: existing_vms is defined and existing_vms.virtual_machines is defined
-
-    - debug:
-        var: existing_vmid_list  # Debugging-Ausgabe zur Überprüfung der vorhandenen VM-IDs
-
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
@@ -55,5 +30,3 @@
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
-      when: existing_vms is not defined or existing_vms.virtual_machines | map(attribute='name') | list | count == 0 or ('{{ base_name }}-{{ starting_id + item }}' not in existing_vms.virtual_machines | map(attribute='name') | list)
-
