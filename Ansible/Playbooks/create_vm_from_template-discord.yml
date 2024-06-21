@@ -4,15 +4,16 @@
   gather_facts: false
 
   vars:
-    vm_count: 5  # Anzahl der zu erstellenden VMs
+    vm_count: 5
     base_name: "VM-auto"
-    starting_id: 2007  # Start-ID für die VMs
+    starting_id: 2100
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
     api_host: "10.80.15.32"
     bridge_interface: "vmbr1"
-    
+    discord_webhook_id: "1253674735649161247"
+    discord_webhook_token: "vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
 
   tasks:
     - name: Create new VM using Cloud-Init and DHCP configuration
@@ -33,7 +34,7 @@
         scsihw: virtio-scsi-pci
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
-        state: present  # Create the VM but do not start it
+        state: present
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
@@ -41,6 +42,6 @@
 
     - name: Send a message to the Discord channel
       community.general.discord:
-          webhook_id: "https://discord.com/api/webhooks/1253674735649161247"
-          webhook_token: "vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
-          content: "This is a message from ansible"
+        webhook_id: "{{ discord_webhook_id }}"
+        webhook_token: "{{ discord_webhook_token }}"
+        content: "VM creation completed successfully."
