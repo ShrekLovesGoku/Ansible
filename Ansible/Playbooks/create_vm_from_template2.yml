@@ -8,25 +8,44 @@
     base_name: "VM-auto"
     starting_id: 2001  # Start-ID für die VMs
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
-    
+    api_user: "root@pam"
+    api_password: "Zli12345"
+    api_host: "10.80.15.32"
+    bridge_interface: "vmbr1"
+    slack_webhook: "https://hooks.slack.com/services/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"  # Slack Webhook URL hier einfügen
 
   tasks:
     - name: Create new VM using Cloud-Init and DHCP configuration
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
-        api_user: root@pam
-        api_password: Zli12345
-        api_host: 10.80.15.32
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
-        scsihw: virtio-scsi-pci  # Specify SCSI controller type
+        scsihw: virtio-scsi-pci
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         net:
-          net0: 'virtio,bridge=vmbr1'
+          net0: 'virtio,bridge={{ bridge_interface }}'
         state: present  # Create the VM but do not start it
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
         loop_var: item
+      register: vm_creation_results
+
+    - name: Send Slack message with VM details
+      when: vm_creation_results is succeeded
+      community.general.slack:
+        token: "xoxe.xoxp-1-Mi0yLTEzMDE2NDAwNTQ2MjctNTgwNTI4MjYzMzM5My03MjY0MTQ2MjIyNTAyLTczMTQwODM0ODAwODQtMzA0ODE3NjFmY2NhZTIxNjBmNzUyYjFmMmY4NzJiMzQ0MWFlNmM4MGNhZmYxMmI5NjY0MmQyZmExNzQ1NjAwNA"
+        channel: "#channel-name"  # Name des Slack-Channels hier einfügen
+        msg: |
+          New VMs have been created:
+          {% for result in vm_creation_results.results %}
+          - Name: {{ result.item.name }}
+            ID: {{ result.item.vmid }}
+            IP Address: {{ result.item.ip }}
+            MAC Address: {{ result.item.macaddr }}
+          {% endfor %}
