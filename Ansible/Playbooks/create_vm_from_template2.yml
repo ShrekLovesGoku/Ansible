@@ -29,7 +29,8 @@
         sshkeys: "{{ ssh_keys }}"
         net:
           net0: 'virtio,bridge=vmbr1'
-        ipconfig: dhcp  # Correct format for DHCP configuration
+        ipconfig: 
+          - ip: dhcp
         state: present  # Create the VM but do not start it
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
