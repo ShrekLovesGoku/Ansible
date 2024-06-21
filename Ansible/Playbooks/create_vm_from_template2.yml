@@ -24,11 +24,10 @@
         ide:
           ide2: 'local:cloudinit,format=qcow2'
         scsihw: virtio-scsi-pci  # Specify SCSI controller type
-        disks:
-          - size: 10G  # Specify size of the SCSI disk (e.g., 10G for 10 GB)
-            type: scsi  # Specify disk type as SCSI
-            storage: local  # Specify storage type (e.g., local storage)
-            format: qcow2  # Specify disk format
+        virtio: scsi  # Specify disk type as SCSI
+        size: 10G  # Specify size of the SCSI disk (e.g., 10G for 10 GB)
+        storage: local  # Specify storage type (e.g., local storage)
+        format: qcow2  # Specify disk format
         ciuser: "user{{ starting_id + item }}"
         cipassword: "password{{ starting_id + item }}"
         sshkeys: "{{ ssh_keys }}"
