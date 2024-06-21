@@ -1,12 +1,12 @@
 ---
-- name: Create and start multiple VMs using Cloud-Init and DHCP configuration
+- name: Create multiple VMs using Cloud-Init and DHCP configuration
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
 
   vars:
-    vm_count: 2
+    vm_count: 5
     base_name: "VM-auto"
-    starting_id: 2107
+    starting_id: 2100
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -22,8 +22,8 @@
         api_user: "{{ api_user }}"
         api_password: "{{ api_password }}"
         api_host: "{{ api_host }}"
-        name: "{{ base_name }}-{{ starting_id + (item - 1) }}"
-        vmid: "{{ starting_id + (item - 1) }}"
+        name: "{{ base_name }}-{{ starting_id + item }}"
+        vmid: "{{ starting_id + item }}"
         ide:
           ide2: 'local:cloudinit,format=qcow2'
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
@@ -40,44 +40,8 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Start the created VMs
-      community.general.proxmox_vm:
-        node: diego-proxmox-srv
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-        vmid: "{{ item.vmid }}"
-        state: started
-      loop: "{{ vm_creation_results.results }}"
-      when: item.changed
-
-    - name: Gather VM information
-      community.general.proxmox_vm_info:
-        node: diego-proxmox-srv
-        api_user: "{{ api_user }}"
-        api_password: "{{ api_password }}"
-        api_host: "{{ api_host }}"
-      register: vm_info
-
-    - name: Extract IP and MAC addresses of created VMs
-      set_fact:
-        vm_info_list: "{{ vm_info.virtual_machines | default([]) | map(attribute='name') | list }}"
-      when: vm_info.virtual_machines is defined
-
-    - name: "Fallback: Extract IP and MAC addresses from hostvars"
-      set_fact:
-        vm_info_list: "{{ vm_creation_results.results | map(attribute='ansible_loop_var') | list }}"
-      when: vm_info.virtual_machines is not defined
-
-    - name: Send VM information to Discord channel
+    - name: Send a message to the Discord channel
       community.general.discord:
         webhook_id: "{{ discord_webhook_id }}"
         webhook_token: "{{ discord_webhook_token }}"
-        content: |
-          VM creation completed successfully.
-
-          {% for vm_name in vm_info_list %}
-          Name: {{ vm_name }}
-          IP Address: {{ hostvars[inventory_hostname]['ansible_' + 'ipv4']['address'] }}
-          MAC Address: {{ hostvars[inventory_hostname]['ansible_' + 'enp6s0']['macaddress'] }}
-          {% endfor %}
+        content: "VM creation completed successfully."
