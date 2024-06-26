@@ -4,7 +4,7 @@
   gather_facts: false
 
   vars:
-    vm_count: 5
+    vm_count: 2
     base_name: "VM-auto"
     starting_id: 2200
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
@@ -29,7 +29,7 @@
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
         cores: 3
         memory: 2048
-        scsi: scsi='{"WDC-1TB_sda-HDD:16,format=qcow2"}'
+        sata: scsi='{"WDC-1TB_sda-HDD:32,format=qcow2"}'
         bios: ovmf
         scsihw: virtio-scsi-pci
         net:
