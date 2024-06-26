@@ -12,6 +12,7 @@
     api_password: "Zli12345"
     api_host: "10.80.15.32"
     bridge_interface: "vmbr1"
+    bridge_interface2: "vmbr0"
     discord_webhook_id: "1253674735649161247"
     discord_webhook_token: "vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
 
@@ -32,6 +33,7 @@
         bios: ovmf
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
+          net1: 'virtio,bridge={{ bridge_interface2 }}'
         state: present
       loop: "{{ range(1, vm_count + 1) | list }}"
       loop_control:
@@ -47,7 +49,7 @@
         disk: "scsi3"
         format: "qcow2"
         storage: "local"
-        size: 16
+        size: 32
         create: "forced"
         state: "present"
       loop: "{{ range(1, vm_count + 1) | list }}"
