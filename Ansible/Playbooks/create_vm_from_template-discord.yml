@@ -6,7 +6,7 @@
   vars:
     vm_count: 2
     base_name: "VM-auto"
-    starting_id: 2300
+    starting_id: 2400
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -24,8 +24,6 @@
         api_host: "{{ api_host }}"
         name: "{{ base_name }}-{{ starting_id + item }}"
         vmid: "{{ starting_id + item }}"
-        ide:
-          ide2: 'local:cloudinit,format=qcow2'
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
         cores: 3
         memory: 2048
