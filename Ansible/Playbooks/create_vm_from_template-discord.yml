@@ -44,4 +44,4 @@
       community.general.discord:
         webhook_id: "{{ discord_webhook_id }}"
         webhook_token: "{{ discord_webhook_token }}"
-        content: "VM creation completed successfully."
+        content: "VM wurde erfolgreich erstellt."
