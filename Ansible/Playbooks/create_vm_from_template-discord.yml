@@ -6,7 +6,7 @@
   vars:
     vm_count: 2
     base_name: "VM-auto"
-    starting_id: 2700
+    starting_id: 2600
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -46,7 +46,7 @@
         vmid: "{{ starting_id + item }}"
         disk: "scsi3"
         format: "qcow2"
-        storage: "WDC-1TB_sda-HDD"
+        storage: "local"
         size: 16
         create: "forced"
         state: "present"
