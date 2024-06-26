@@ -48,7 +48,7 @@
         vmid: "{{ starting_id + item }}"
         disk: "scsi3"
         format: "qcow2"
-        storage: "WDC-120GB_sdd-SSD"
+        storage: "local"
         size: 32
         create: "forced"
         state: "present"
