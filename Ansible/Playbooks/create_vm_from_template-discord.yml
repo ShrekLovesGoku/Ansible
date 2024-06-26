@@ -29,9 +29,9 @@
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
         cores: 3
         memory: 2048
+        scsihw: virtio-scsi-pci
         scsi: scsi='{"WDC-1TB_sdc-HDD":"32", "format":"qcow2"}'
         bios: ovmf
-        scsihw: virtio-scsi-pci
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
         state: present
