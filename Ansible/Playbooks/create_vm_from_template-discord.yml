@@ -29,7 +29,7 @@
         ipconfig: '{"ipconfig0": "ip=dhcp"}'
         cores: 3
         memory: 2048
-        sata0: 'WDC-1TB_sda-HDD:32,format=qcow2'
+        sata: 'WDC-1TB_sda-HDD:32,format=qcow2'
         bios: ovmf
         scsihw: virtio-scsi-pci
         net:
