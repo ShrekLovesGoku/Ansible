@@ -1,5 +1,5 @@
 ---
-- name: Create multiple VMs using Cloud-Init and DHCP configuration
+- name: VMs erstellen
   hosts: PXEAnsibleDC-Proxmox
   gather_facts: false
 
@@ -16,7 +16,7 @@
     discord_webhook_token: "vXToJvvUcKHB6u40F5GfRUcN0Fe4ORa5tQDu5Sifp-J1EHU0RkTMQ4EfjNkfSJRtJpr1"
 
   tasks:
-    - name: Create new VM using Cloud-Init and DHCP configuration
+    - name: Neue VM erstellen
       community.general.proxmox_kvm:
         node: diego-proxmox-srv
         api_user: "{{ api_user }}"
@@ -38,8 +38,27 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Send a message to the Discord channel
+    - name: Festplatte für VM erstellen 
+      community.general.proxmox_disk:
+        api_host: "{{ api_host }}"
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        vmid: "{{ starting_id + item }}"
+        disk: "scsi3"
+        format: "qcow2"
+        storage: "local"
+        size: "16G"
+        create: "forced"
+        state: "present"
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
+
+    - name: Nachricht in Discord senden
       community.general.discord:
         webhook_id: "{{ discord_webhook_id }}"
         webhook_token: "{{ discord_webhook_token }}"
-        content: "VM wurde erfolgreich erstellt."
+        content: "VM {{ base_name }}-{{ starting_id + item }} wurde erfolgreich erstellt."
+      loop: "{{ range(1, vm_count + 1) | list }}"
+      loop_control:
+        loop_var: item
