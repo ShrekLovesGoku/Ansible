@@ -6,7 +6,7 @@
   vars:
     vm_count: 2
     base_name: "VM-auto"
-    starting_id: 2500
+    starting_id: 2400
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
@@ -38,7 +38,7 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Festplatte für VM erstellen 
+    - name: Festplatte für VM erstellen (force rewrite in case it exists already)
       community.general.proxmox_disk:
         api_host: "{{ api_host }}"
         api_user: "{{ api_user }}"
@@ -47,7 +47,7 @@
         disk: "scsi3"
         format: "qcow2"
         storage: "local"
-        size: "16G"
+        size: 16G
         create: "forced"
         state: "present"
       loop: "{{ range(1, vm_count + 1) | list }}"
