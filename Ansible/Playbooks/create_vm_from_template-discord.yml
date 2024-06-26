@@ -38,7 +38,7 @@
         loop_var: item
       register: vm_creation_results
 
-    - name: Festplatte für VM erstellen (force rewrite in case it exists already)
+    - name: Festplatte für VM erstellen 
       community.general.proxmox_disk:
         api_host: "{{ api_host }}"
         api_user: "{{ api_user }}"
