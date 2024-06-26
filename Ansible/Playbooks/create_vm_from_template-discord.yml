@@ -31,7 +31,6 @@
         memory: 2048
         sata: sata='WDC-1TB_sda-HDD:32,format=qcow2'
         bios: ovmf
-        scsihw: virtio-scsi-pci
         net:
           net0: 'virtio,bridge={{ bridge_interface }}'
         state: present
