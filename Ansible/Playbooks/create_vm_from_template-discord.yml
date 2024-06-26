@@ -6,7 +6,7 @@
   vars:
     vm_count: 2
     base_name: "VM-auto"
-    starting_id: 2400
+    starting_id: 2600
     ansible_python_interpreter: "/root/proxmoxer-venv/bin/python3"
     api_user: "root@pam"
     api_password: "Zli12345"
